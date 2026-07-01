@@ -16,6 +16,8 @@ export const plansTable = pgTable("plans", {
   cpu: text("cpu"),
   storage: text("storage"),
   bandwidth: text("bandwidth"),
+  imageUrl: text("image_url"),
+  gameType: text("game_type"),
   isPopular: boolean("is_popular").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
   sortOrder: serial("sort_order"),

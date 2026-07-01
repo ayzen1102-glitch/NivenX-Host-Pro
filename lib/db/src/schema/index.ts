@@ -7,3 +7,6 @@ export * from "./announcements";
 export * from "./knowledgebase";
 export * from "./settings";
 export * from "./sessions";
+export * from "./partners";
+export * from "./reviews";
+export * from "./games";

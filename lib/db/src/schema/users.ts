@@ -8,6 +8,7 @@ export const usersTable = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   name: text("name").notNull(),
   role: text("role").notNull().default("user"),
+  clerkId: text("clerk_id").unique(),
   avatarUrl: text("avatar_url"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
@@ -16,5 +17,6 @@ export const usersTable = pgTable("users", {
 });
 
 export const insertUserSchema = createInsertSchema(usersTable).omit({ id: true, createdAt: true, updatedAt: true });
+export const upsertUserSchema = insertUserSchema.partial();
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof usersTable.$inferSelect;
