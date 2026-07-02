@@ -8,6 +8,7 @@ import ticketsRouter from "./tickets";
 import announcementsRouter from "./announcements";
 import dashboardRouter from "./dashboard";
 import adminRouter from "./admin";
+import publicRouter from "./public";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(ticketsRouter);
 router.use(announcementsRouter);
 router.use(dashboardRouter);
 router.use(adminRouter);
+router.use(publicRouter);
 
 export default router;

@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable, plansTable, ticketsTable, invoicesTable, servicesTable, announcementsTable, siteSettingsTable } from "@workspace/db";
+import { db, usersTable, plansTable, ticketsTable, invoicesTable, servicesTable, announcementsTable, siteSettingsTable, partnersTable, reviewsTable, gamesTable } from "@workspace/db";
 import { eq, count, sum, desc } from "drizzle-orm";
 import { requireAdmin } from "../middlewares/auth";
 import { UpdateAdminUserParams, UpdateAdminUserBody, CreateAdminPlanBody, UpdateAdminPlanParams, UpdateAdminPlanBody, DeleteAdminPlanParams, CreateAdminAnnouncementBody } from "@workspace/api-zod";
@@ -121,6 +121,105 @@ router.patch("/admin/settings", requireAdmin, async (req, res): Promise<void> =>
     [settings] = await db.update(siteSettingsTable).set(data as any).where(eq(siteSettingsTable.id, existing.id)).returning();
   }
   res.json(settings);
+});
+
+// ── Partners ─────────────────────────────────────────────────
+router.get("/admin/partners", requireAdmin, async (_req, res): Promise<void> => {
+  const rows = await db.select().from(partnersTable).orderBy(partnersTable.sortOrder);
+  res.json(rows);
+});
+
+router.post("/admin/partners", requireAdmin, async (req, res): Promise<void> => {
+  const { name, logoUrl, websiteUrl, sortOrder } = req.body as any;
+  if (!name) { res.status(400).json({ error: "name required" }); return; }
+  const [row] = await db.insert(partnersTable).values({ name, logoUrl, websiteUrl, sortOrder: sortOrder ?? 0 }).returning();
+  res.status(201).json(row);
+});
+
+router.patch("/admin/partners/:id", requireAdmin, async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id);
+  const { name, logoUrl, websiteUrl, sortOrder, isActive } = req.body as any;
+  const data: any = {};
+  if (name !== undefined) data.name = name;
+  if (logoUrl !== undefined) data.logoUrl = logoUrl;
+  if (websiteUrl !== undefined) data.websiteUrl = websiteUrl;
+  if (sortOrder !== undefined) data.sortOrder = sortOrder;
+  if (isActive !== undefined) data.isActive = isActive;
+  const [row] = await db.update(partnersTable).set(data).where(eq(partnersTable.id, id)).returning();
+  if (!row) { res.status(404).json({ error: "Not found" }); return; }
+  res.json(row);
+});
+
+router.delete("/admin/partners/:id", requireAdmin, async (req, res): Promise<void> => {
+  await db.delete(partnersTable).where(eq(partnersTable.id, parseInt(req.params.id)));
+  res.sendStatus(204);
+});
+
+// ── Reviews ──────────────────────────────────────────────────
+router.get("/admin/reviews", requireAdmin, async (_req, res): Promise<void> => {
+  const rows = await db.select().from(reviewsTable).orderBy(reviewsTable.sortOrder);
+  res.json(rows);
+});
+
+router.post("/admin/reviews", requireAdmin, async (req, res): Promise<void> => {
+  const { name, avatarUrl, rating, comment, source, sortOrder } = req.body as any;
+  if (!name || !comment) { res.status(400).json({ error: "name and comment required" }); return; }
+  const [row] = await db.insert(reviewsTable).values({ name, avatarUrl, rating: rating ?? 5, comment, source: source ?? "trustpilot", sortOrder: sortOrder ?? 0 }).returning();
+  res.status(201).json(row);
+});
+
+router.patch("/admin/reviews/:id", requireAdmin, async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id);
+  const { name, avatarUrl, rating, comment, source, sortOrder, isActive } = req.body as any;
+  const data: any = {};
+  if (name !== undefined) data.name = name;
+  if (avatarUrl !== undefined) data.avatarUrl = avatarUrl;
+  if (rating !== undefined) data.rating = rating;
+  if (comment !== undefined) data.comment = comment;
+  if (source !== undefined) data.source = source;
+  if (sortOrder !== undefined) data.sortOrder = sortOrder;
+  if (isActive !== undefined) data.isActive = isActive;
+  const [row] = await db.update(reviewsTable).set(data).where(eq(reviewsTable.id, id)).returning();
+  if (!row) { res.status(404).json({ error: "Not found" }); return; }
+  res.json(row);
+});
+
+router.delete("/admin/reviews/:id", requireAdmin, async (req, res): Promise<void> => {
+  await db.delete(reviewsTable).where(eq(reviewsTable.id, parseInt(req.params.id)));
+  res.sendStatus(204);
+});
+
+// ── Games ────────────────────────────────────────────────────
+router.get("/admin/games", requireAdmin, async (_req, res): Promise<void> => {
+  const rows = await db.select().from(gamesTable).orderBy(gamesTable.sortOrder);
+  res.json(rows);
+});
+
+router.post("/admin/games", requireAdmin, async (req, res): Promise<void> => {
+  const { name, slug, imageUrl, description, sortOrder } = req.body as any;
+  if (!name || !slug) { res.status(400).json({ error: "name and slug required" }); return; }
+  const [row] = await db.insert(gamesTable).values({ name, slug, imageUrl, description, sortOrder: sortOrder ?? 0 }).returning();
+  res.status(201).json(row);
+});
+
+router.patch("/admin/games/:id", requireAdmin, async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id);
+  const { name, slug, imageUrl, description, sortOrder, isActive } = req.body as any;
+  const data: any = {};
+  if (name !== undefined) data.name = name;
+  if (slug !== undefined) data.slug = slug;
+  if (imageUrl !== undefined) data.imageUrl = imageUrl;
+  if (description !== undefined) data.description = description;
+  if (sortOrder !== undefined) data.sortOrder = sortOrder;
+  if (isActive !== undefined) data.isActive = isActive;
+  const [row] = await db.update(gamesTable).set(data).where(eq(gamesTable.id, id)).returning();
+  if (!row) { res.status(404).json({ error: "Not found" }); return; }
+  res.json(row);
+});
+
+router.delete("/admin/games/:id", requireAdmin, async (req, res): Promise<void> => {
+  await db.delete(gamesTable).where(eq(gamesTable.id, parseInt(req.params.id)));
+  res.sendStatus(204);
 });
 
 export default router;

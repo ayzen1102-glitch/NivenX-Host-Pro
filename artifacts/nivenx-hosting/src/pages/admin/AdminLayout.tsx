@@ -4,7 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Users, Package, Ticket, Megaphone,
-  BookOpen, Settings, ArrowLeft, Shield, ChevronRight
+  BookOpen, Settings, ArrowLeft, Shield, ChevronRight,
+  Handshake, Star, Gamepad2
 } from "lucide-react";
 
 const navItems = [
@@ -14,6 +15,9 @@ const navItems = [
   { href: "/admin/tickets", label: "Tickets", icon: Ticket },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/kb", label: "Knowledgebase", icon: BookOpen },
+  { href: "/admin/partners", label: "Partners", icon: Handshake },
+  { href: "/admin/reviews", label: "Reviews", icon: Star },
+  { href: "/admin/games", label: "Games", icon: Gamepad2 },
   { href: "/admin/settings", label: "Site Settings", icon: Settings },
 ];
 
